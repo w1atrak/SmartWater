@@ -1,4 +1,7 @@
 from typing import List
+from optimizers import *
+from activation_functions import *
+from initializers import *
 
 
 class NeuralNetwork:
@@ -15,6 +18,8 @@ class NeuralNetwork:
         self.optimizer = optimizer
 
         self.init_neurons()
+        self.init_biases()
+        self.init_weights()
 
     def init_neurons(self):
         for layer in self.layers:
@@ -23,13 +28,13 @@ class NeuralNetwork:
 
     def init_biases(self):
         for layer in self.layers:
-            self.biases.append([self.initializer()] * layer)
+            self.biases.append([self.initializer.initialize()] * layer)
 
     def init_weights(self):
-        for i in range(1, len(self.layers)):
+        for i in range(len(self.layers)):
             self.weights.append(
                 [
-                    [self.initializer() for _ in range(self.layers[i - 1])]
+                    [self.initializer.initialize() for _ in range(self.layers[i - 1])]
                     for _ in range(self.layers[i])
                 ]
             )
@@ -44,9 +49,9 @@ class NeuralNetwork:
         self.neurons[0] = inputs.copy()
 
         for i in range(1, len(self.layers)):
-            for j in range(self.layers[i]):
+            for j in range(len(self.neurons[i])):
                 self.neurons[i][j] = self.biases[i][j]
-                for k in range(self.layers[i - 1]):
+                for k in range(len(self.neurons[i - 1])):
                     self.neurons[i][j] += self.neurons[i - 1][k] * self.weights[i][j][k]
                 self.neurons[i][j] = self.activation_function.activate(
                     self.neurons[i][j]
@@ -73,4 +78,4 @@ class NeuralNetwork:
 
 
 if __name__ == "__main__":
-    nn = NeuralNetwork([2, 2, 1], "sigmoid")
+    pass
