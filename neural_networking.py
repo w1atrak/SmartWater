@@ -78,7 +78,7 @@ class NeuralNetwork:
         self.optimizer.update(self)
 
 
-for _ in range(10):
+if __name__ == "__main__":
     with open("data.csv", "r") as read_obj:
         csv_reader = reader(read_obj)
         data = list(
