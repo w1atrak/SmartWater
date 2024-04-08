@@ -1,4 +1,5 @@
 from typing import List
+from csv import reader
 from optimizers import *
 from activation_functions import *
 from initializers import *
@@ -77,5 +78,27 @@ class NeuralNetwork:
         self.optimizer.update(self)
 
 
-if __name__ == "__main__":
-    pass
+for _ in range(10):
+    with open("data.csv", "r") as read_obj:
+        csv_reader = reader(read_obj)
+        data = list(
+            map(lambda x: [list(map(float, x[:-1])), [float(x[-1])]], list(csv_reader))
+        )
+        x, y = zip(*data)
+        x = list(x)
+        y = list(y)
+
+    neural_network = NeuralNetwork(
+        layers=[len(x[0]), 2, 1],
+        activation_function=ReLU(),
+        initializer=RandomInitializer(),
+        optimizer=AdamOptimizer(0.01),
+    )
+
+    for _ in range(20000):
+        for i in range(len(x)):
+            neural_network.back_propagation(x[i], y[i])
+
+    for i in range(len(x)):
+        print(y[i], end=" -> ")
+        print(neural_network.feed_forward(x[i]))
