@@ -12,7 +12,6 @@ class NeuralNetwork:
         self.biases: List[List[float]] = []
         self.delta: List[List[float]] = []
         self.weights: List[List[List[float]]] = []
-        self.weights_delta: List[List[List[float]]] = []
 
         self.activation_function = activation_function
         self.initializer = initializer
@@ -36,12 +35,6 @@ class NeuralNetwork:
             self.weights.append(
                 [
                     [self.initializer.initialize() for _ in range(self.layers[i - 1])]
-                    for _ in range(self.layers[i])
-                ]
-            )
-            self.weights_delta.append(
-                [
-                    [0.0 for _ in range(self.layers[i - 1])]
                     for _ in range(self.layers[i])
                 ]
             )
@@ -95,7 +88,7 @@ if __name__ == "__main__":
         optimizer=AdamOptimizer(0.01),
     )
 
-    for _ in range(20000):
+    for _ in range(20_000):
         for i in range(len(x)):
             neural_network.back_propagation(x[i], y[i])
 
