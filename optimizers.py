@@ -55,3 +55,19 @@ class AdamOptimizer(Optimizer):
                     neural_network.weights[i][j][k] += (
                         self.learning_rate * m_hat / (math.sqrt(v_hat) + self.epsilon)
                     )
+
+
+class GradientDescentOptimizer(Optimizer):
+
+    def __init__(self, learning_rate=0.01):
+        self.learning_rate = learning_rate
+
+    def update(self, neural_network):
+        for i in range(len(neural_network.weights) - 1, 0, -1):
+            for j in range(len(neural_network.neurons[i])):
+                for k in range(len(neural_network.neurons[i - 1])):
+                    neural_network.weights[i][j][k] -= (
+                        self.learning_rate
+                        * neural_network.delta[i][j]
+                        * neural_network.neurons[i - 1][k]
+                    )
