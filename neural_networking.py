@@ -1,5 +1,5 @@
 from typing import List
-from csv import reader
+from csv import reader, writer
 from optimizers import *
 from activation_functions import *
 from initializers import *
@@ -34,7 +34,14 @@ class NeuralNetwork:
         for i in range(len(self.layers)):
             self.weights.append(
                 [
-                    [self.initializer.initialize() for _ in range(self.layers[i - 1])]
+                    [
+                        (
+                            self.initializer.initialize(randomized=False)
+                            if isinstance(self.initializer, FileInitializer)
+                            else self.initializer.initialize()
+                        )
+                        for _ in range(self.layers[i - 1])
+                    ]
                     for _ in range(self.layers[i])
                 ]
             )
@@ -70,9 +77,16 @@ class NeuralNetwork:
 
         self.optimizer.update(self)
 
+    def save_weights(self):
+        with open("weights.csv", "w", newline="") as write_obj:
+            csv_writer = writer(write_obj)
+            for layer in self.weights:
+                for weights in layer:
+                    csv_writer.writerow(weights)
+
 
 if __name__ == "__main__":
-    with open("data.csv", "r") as read_obj:
+    with open("train_data.csv", "r") as read_obj:
         csv_reader = reader(read_obj)
         data = list(
             map(lambda x: [list(map(float, x[:-1])), [float(x[-1])]], list(csv_reader))
@@ -82,10 +96,10 @@ if __name__ == "__main__":
         y = list(y)
 
     neural_network = NeuralNetwork(
-        layers=[len(x[0]), 2, 1],
+        layers=[len(x[0]), 2, 2, 1],
         activation_function=ReLU(),
-        initializer=RandomInitializer(),
-        optimizer=AdamOptimizer(0.01),
+        initializer=FileInitializer(),
+        optimizer=GradientDescentOptimizer(),
     )
 
     for _ in range(20_000):
@@ -95,3 +109,6 @@ if __name__ == "__main__":
     for i in range(len(x)):
         print(y[i], end=" -> ")
         print(neural_network.feed_forward(x[i]))
+
+    if isinstance(neural_network.initializer, FileInitializer):
+        neural_network.save_weights()
