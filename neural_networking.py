@@ -3,6 +3,16 @@ from csv import reader, writer
 from optimizers import *
 from activation_functions import *
 from initializers import *
+from dotenv import load_dotenv
+import os
+
+load_dotenv(verbose=True)
+try:
+    EPOCHS = int(os.getenv("EPOCHS"))
+    HIDDEN_LAYERS = [int(l) for l in os.getenv("HIDDEN_LAYERS").split(",")]
+except Exception:
+    print("Environment variables are likely invalid or not set correctly.")
+    exit()
 
 
 class NeuralNetwork:
@@ -96,13 +106,13 @@ if __name__ == "__main__":
         y = list(y)
 
     neural_network = NeuralNetwork(
-        layers=[len(x[0]), 2, 2, 1],
+        layers=[len(x[0])] + HIDDEN_LAYERS + [1],
         activation_function=ReLU(),
         initializer=FileInitializer(),
         optimizer=GradientDescentOptimizer(),
     )
 
-    for _ in range(20_000):
+    for _ in range(EPOCHS):
         for i in range(len(x)):
             neural_network.back_propagation(x[i], y[i])
 
