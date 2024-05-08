@@ -5,6 +5,8 @@ from activation_functions import *
 from initializers import *
 from dotenv import load_dotenv
 import os
+from time import sleep
+import threading
 
 load_dotenv(verbose=True)
 try:
@@ -71,7 +73,7 @@ class NeuralNetwork:
         return self.neurons[-1]
 
     def back_propagation(self, inputs: List[float], targets: List[float]):
-        self.feed_forward(inputs)
+        prediction = self.feed_forward(inputs)
 
         for i in range(self.layers[-1]):
             self.delta[-1][i] = self.neurons[-1][i] - targets[i]
@@ -86,6 +88,7 @@ class NeuralNetwork:
                 )
 
         self.optimizer.update(self)
+        return prediction
 
     def save_weights(self):
         with open("weights.csv", "w", newline="") as write_obj:
@@ -96,29 +99,34 @@ class NeuralNetwork:
 
 
 if __name__ == "__main__":
-    with open("train_data.csv", "r") as read_obj:
-        csv_reader = reader(read_obj)
-        data = list(
-            map(lambda x: [list(map(float, x[:-1])), [float(x[-1])]], list(csv_reader))
-        )
-        x, y = zip(*data)
-        x = list(x)
-        y = list(y)
+    neural_network = None
+    watering = True
 
-    neural_network = NeuralNetwork(
-        layers=[len(x[0])] + HIDDEN_LAYERS + [1],
-        activation_function=ReLU(),
-        initializer=FileInitializer(),
-        optimizer=GradientDescentOptimizer(),
-    )
+    while watering:
+        sleep(1)
+        with open("new.csv", "r") as read_obj:
+            csv_reader = reader(read_obj)
+            data = list(
+                map(
+                    lambda x: [list(map(float, x[:-1])), [float(x[-1])]],
+                    list(csv_reader),
+                )
+            )
+            x, y = zip(*data)
+            x = list(x)
+            y = list(y)
 
-    for _ in range(EPOCHS):
-        for i in range(len(x)):
-            neural_network.back_propagation(x[i], y[i])
+            neural_network = neural_network or NeuralNetwork(
+                layers=[len(x[0])] + HIDDEN_LAYERS + [1],
+                activation_function=ReLU(),
+                initializer=FileInitializer(),
+                optimizer=GradientDescentOptimizer(),
+            )
 
-    for i in range(len(x)):
-        print(y[i], end=" -> ")
-        print(neural_network.feed_forward(x[i]))
+            for e in range(EPOCHS):
+                for i in range(len(x)):
+                    pred = neural_network.back_propagation(x[i], y[i])
+                    if e == EPOCHS - 1:
+                        print(f"{y[i]} -> {pred}")
 
-    if isinstance(neural_network.initializer, FileInitializer):
-        neural_network.save_weights()
+            threading.Thread(target=neural_network.save_weights).start()
