@@ -30,7 +30,7 @@ while True:
 
     print(data_line)
 
-    with open("train_data.csv", "a", newline="") as file:
+    with open("../train_data.csv", "a", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(data_line)
 
