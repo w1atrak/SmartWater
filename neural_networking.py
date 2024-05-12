@@ -12,6 +12,7 @@ load_dotenv(verbose=True)
 try:
     EPOCHS = int(os.getenv("EPOCHS"))
     HIDDEN_LAYERS = [int(l) for l in os.getenv("HIDDEN_LAYERS").split(",")]
+    SUFFIX = os.getenv("SUFFIX")
 except Exception:
     print("Environment variables are likely invalid or not set correctly.")
     exit()
@@ -91,7 +92,7 @@ class NeuralNetwork:
         return prediction
 
     def save_weights(self):
-        with open("weights.csv", "w", newline="") as write_obj:
+        with open(f"weights{SUFFIX}.csv", "w", newline="") as write_obj:
             csv_writer = writer(write_obj)
             for layer in self.weights:
                 for weights in layer:
@@ -119,7 +120,7 @@ if __name__ == "__main__":
             neural_network = neural_network or NeuralNetwork(
                 layers=[len(x[0])] + HIDDEN_LAYERS + [1],
                 activation_function=ReLU(),
-                initializer=FileInitializer(),
+                initializer=FileInitializer(SUFFIX),
                 optimizer=GradientDescentOptimizer(),
             )
 

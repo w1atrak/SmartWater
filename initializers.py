@@ -16,9 +16,9 @@ class RandomInitializer(Initializer):
 class FileInitializer(Initializer):
     weights = []
 
-    def __init__(self):
+    def __init__(self, suffix):
         try:
-            with open("weights.csv", "r") as file:
+            with open(f"weights{suffix}.csv", "r") as file:
                 csv_reader = csv.reader(file)
                 for row in csv_reader:
                     for v in list(map(float, row)):
