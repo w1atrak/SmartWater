@@ -5,6 +5,8 @@ from time import sleep
 
 arduino = serial.Serial("COM3", 9600)
 
+previous_data = None
+deltas = [0.3, 0.1, 1, 0.1, 0.1] # temp, humidity, light, soil_humidity passed_time
 
 def read_from_arduino():
     line = arduino.readline().decode().strip()
@@ -28,12 +30,17 @@ while True:
     data_line.append(max(0, min(data["soil_humidity"], 1000)) / 1000)
     data_line.append(button)
 
-    print(data_line)
+    if previous_data is None or any(
+        abs(data_line[i] - previous_data[i]) > threshhold
+        for i, threshhold in enumerate(deltas)
+    ):
+        print(data_line)
 
-    with open("../train_data.csv", "a", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(data_line)
+        with open("../train_data.csv", "a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(data_line)
+        with open("../new.csv", "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(data_line)
+        previous_data = data_line
 
-    with open("../new.csv", "w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(data_line)
