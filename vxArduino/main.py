@@ -6,7 +6,7 @@ from time import sleep
 arduino = serial.Serial("COM3", 9600)
 
 previous_data = None
-deltas = [0.3, 0.1, 1, 0.1, 0.1] # temp, humidity, light, soil_humidity passed_time
+deltas = [ 0.1, 0.3, 0.1, 1, 0.1] # time_passed, temp, humidity, light, soil_humidity
 
 def read_from_arduino():
     line = arduino.readline().decode().strip()
