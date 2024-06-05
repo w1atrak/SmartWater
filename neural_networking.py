@@ -3,19 +3,10 @@ from csv import reader, writer
 from optimizers import *
 from activation_functions import *
 from initializers import *
-from dotenv import load_dotenv
-import os
-from time import sleep
 import threading
 
-load_dotenv(verbose=True)
-try:
-    EPOCHS = int(os.getenv("EPOCHS"))
-    HIDDEN_LAYERS = [int(l) for l in os.getenv("HIDDEN_LAYERS").split(",")]
-    SUFFIX = os.getenv("SUFFIX")
-except Exception:
-    print("Environment variables are likely invalid or not set correctly.")
-    exit()
+
+EPOCHS = 5_000
 
 
 class NeuralNetwork:
@@ -91,21 +82,44 @@ class NeuralNetwork:
         self.optimizer.update(self)
         return prediction
 
-    def save_weights(self):
-        with open(f"weights{SUFFIX}.csv", "w", newline="") as write_obj:
+    def save_weights(self, suffix):
+        with open(f"weights{suffix}.csv", "w", newline="") as write_obj:
             csv_writer = writer(write_obj)
             for layer in self.weights:
                 for weights in layer:
                     csv_writer.writerow(weights)
 
 
-if __name__ == "__main__":
-    neural_network = None
-    watering = True
+def training():
+    configs = [
+        {
+            "layers": [4, 3],
+            "activation_function": Sigmoid(),
+        },
+        {
+            "layers": [4, 4, 4],
+            "activation_function": Sigmoid(),
+        },
+        {
+            "layers": [3, 3, 3, 3],
+            "activation_function": Sigmoid(),
+        },
+        {
+            "layers": [4, 3],
+            "activation_function": TanH(),
+        },
+        {
+            "layers": [4, 4, 4],
+            "activation_function": TanH(),
+        },
+        {
+            "layers": [3, 3, 3, 3],
+            "activation_function": TanH(),
+        },
+    ]
 
-    while watering:
-        sleep(1)
-        with open("new.csv", "r") as read_obj:
+    for c in configs:
+        with open("train_data.csv", "r") as read_obj:
             csv_reader = reader(read_obj)
             data = list(
                 map(
@@ -117,17 +131,32 @@ if __name__ == "__main__":
             x = list(x)
             y = list(y)
 
-            neural_network = neural_network or NeuralNetwork(
-                layers=[len(x[0])] + HIDDEN_LAYERS + [1],
-                activation_function=ReLU(),
-                initializer=FileInitializer(SUFFIX),
+            neural_network = NeuralNetwork(
+                layers=c["layers"],
+                activation_function=c["activation_function"],
+                initializer=FileInitializer(f"{c['layers']}"),
                 optimizer=GradientDescentOptimizer(),
             )
 
-            for e in range(EPOCHS):
+            for _ in range(EPOCHS):
                 for i in range(len(x)):
-                    pred = neural_network.back_propagation(x[i], y[i])
-                    if e == EPOCHS - 1:
-                        print(f"{y[i]} -> {pred}")
+                    neural_network.back_propagation(x[i], y[i])
 
-            threading.Thread(target=neural_network.save_weights).start()
+            threading.Thread(
+                target=neural_network.save_weights, args=(f"{c['layers']}",)
+            ).start()
+
+
+def predict(
+    x: List[float],
+    layers: List[int],
+    activation_function: ActivationFunction,
+):
+    neural_network = NeuralNetwork(
+        layers=layers,
+        activation_function=activation_function,
+        initializer=FileInitializer(f"{layers}"),
+        optimizer=GradientDescentOptimizer(),
+    )
+    print(res := neural_network.feed_forward(x))
+    return res
