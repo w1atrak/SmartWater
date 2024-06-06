@@ -148,12 +148,12 @@ def training():
 
 
 def predict(
-    x: List[float],
+    x,
     layers: List[int],
     activation_function: ActivationFunction,
 ):
     neural_network = NeuralNetwork(
-        layers=layers,
+        layers=[len(x)] + layers + [1],
         activation_function=activation_function,
         initializer=FileInitializer(f"{layers}"),
         optimizer=GradientDescentOptimizer(),
