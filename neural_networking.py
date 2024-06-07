@@ -6,7 +6,7 @@ from initializers import *
 import threading
 
 
-EPOCHS = 5_000
+EPOCHS = 50_000
 
 
 class NeuralNetwork:
@@ -162,3 +162,5 @@ def predict(
     )
     print(res := neural_network.feed_forward(x))
     return res
+
+training()
