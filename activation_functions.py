@@ -24,6 +24,9 @@ class Sigmoid(ActivationFunction):
     def derivative(self, x):
         return self.activate(x) * (1 - self.activate(x))
 
+    def __str__(self):
+        return "Sigmoid"
+
 
 class TanH(ActivationFunction):
     def activate(self, x):
@@ -31,3 +34,6 @@ class TanH(ActivationFunction):
 
     def derivative(self, x):
         return 1 - pow(self.activate(x), 2)
+
+    def __str__(self):
+        return "TanH"

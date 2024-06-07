@@ -83,6 +83,7 @@ class NeuralNetwork:
         return prediction
 
     def save_weights(self, suffix):
+        print(f"Saving weights to weights{suffix}.csv")
         with open(f"weights{suffix}.csv", "w", newline="") as write_obj:
             csv_writer = writer(write_obj)
             for layer in self.weights:
@@ -143,7 +144,8 @@ def training():
                     neural_network.back_propagation(x[i], y[i])
 
             threading.Thread(
-                target=neural_network.save_weights, args=(f"{c['layers']}",)
+                target=neural_network.save_weights,
+                args=(f"{c['layers']}{c['activation_function']}",),
             ).start()
 
 
@@ -155,7 +157,7 @@ def predict(
     neural_network = NeuralNetwork(
         layers=[len(x)] + layers + [1],
         activation_function=activation_function,
-        initializer=FileInitializer(f"{layers}"),
+        initializer=FileInitializer(f"{layers}{activation_function}"),
         optimizer=GradientDescentOptimizer(),
     )
     print(res := neural_network.feed_forward(x))
