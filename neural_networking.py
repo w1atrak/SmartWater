@@ -133,7 +133,7 @@ def training():
             y = list(y)
 
             neural_network = NeuralNetwork(
-                layers=c["layers"],
+                layers=[len(x[0])] + c["layers"] + [1],
                 activation_function=c["activation_function"],
                 initializer=FileInitializer(f"{c['layers']}"),
                 optimizer=GradientDescentOptimizer(),
