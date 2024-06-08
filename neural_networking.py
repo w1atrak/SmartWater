@@ -135,7 +135,7 @@ def training():
             neural_network = NeuralNetwork(
                 layers=[len(x[0])] + c["layers"] + [1],
                 activation_function=c["activation_function"],
-                initializer=FileInitializer(f"{c['layers']}"),
+                initializer=FileInitializer(f"{c['layers']}{c['activation_function']}"),
                 optimizer=GradientDescentOptimizer(),
             )
 
@@ -162,5 +162,6 @@ def predict(
     )
     print(res := neural_network.feed_forward(x))
     return res
+
 
 training()

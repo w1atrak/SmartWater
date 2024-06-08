@@ -23,7 +23,9 @@ class FileInitializer(Initializer):
                 for row in csv_reader:
                     for v in list(map(float, row)):
                         self.weights.append(v)
+            print("File loaded")
         except FileNotFoundError:
+            print("File not found")
             pass
 
     def initialize(self, randomized=True):
