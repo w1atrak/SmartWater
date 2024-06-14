@@ -16,6 +16,9 @@ class ReLU(ActivationFunction):
     def derivative(self, x):
         return 1.0 if x > 0.0 else 0.0
 
+    def __str__(self):
+        return "ReLU"
+
 
 class Sigmoid(ActivationFunction):
     def activate(self, x):

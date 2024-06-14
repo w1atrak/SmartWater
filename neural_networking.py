@@ -117,6 +117,18 @@ def training():
             "layers": [3, 3, 3, 3],
             "activation_function": TanH(),
         },
+        {
+            "layers": [4, 3],
+            "activation_function": ReLU(),
+        },
+        {
+            "layers": [4, 4, 4],
+            "activation_function": ReLU(),
+        },
+        {
+            "layers": [3, 3, 3, 3],
+            "activation_function": ReLU(),
+        },
     ]
 
     for c in configs:
@@ -164,4 +176,5 @@ def predict(
     return res
 
 
-training()
+if __name__ == "__main__":
+    training()
