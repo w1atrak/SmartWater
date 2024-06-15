@@ -6,7 +6,8 @@ from time import sleep
 arduino = serial.Serial("COM3", 9600)
 
 previous_data = None
-deltas = [ 0.1, 0.3, 0.1, 1, 0.1] # time_passed, temp, humidity, light, soil_humidity
+deltas = [0.1, 0.3, 0.1, 1, 0.1]  # time_passed, temp, humidity, light, soil_humidity
+
 
 def read_from_arduino():
     line = arduino.readline().decode().strip()
@@ -39,8 +40,7 @@ while True:
         with open("../train_data.csv", "a", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(data_line)
-        with open("../new.csv", "w", newline="") as file:
+        with open("../new.csv", "a", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(data_line)
         previous_data = data_line
-

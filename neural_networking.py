@@ -8,6 +8,45 @@ import threading
 
 EPOCHS = 50_000
 
+configs = [
+    {
+        "layers": [4, 3],
+        "activation_function": Sigmoid(),
+    },
+    {
+        "layers": [4, 4, 4],
+        "activation_function": Sigmoid(),
+    },
+    {
+        "layers": [3, 3, 3, 3],
+        "activation_function": Sigmoid(),
+    },
+    {
+        "layers": [4, 3],
+        "activation_function": TanH(),
+    },
+    {
+        "layers": [4, 4, 4],
+        "activation_function": TanH(),
+    },
+    {
+        "layers": [3, 3, 3, 3],
+        "activation_function": TanH(),
+    },
+    {
+        "layers": [4, 3],
+        "activation_function": ReLU(),
+    },
+    {
+        "layers": [4, 4, 4],
+        "activation_function": ReLU(),
+    },
+    {
+        "layers": [3, 3, 3, 3],
+        "activation_function": ReLU(),
+    },
+]
+
 
 class NeuralNetwork:
     def __init__(self, layers, activation_function, initializer, optimizer):
@@ -92,44 +131,6 @@ class NeuralNetwork:
 
 
 def training():
-    configs = [
-        {
-            "layers": [4, 3],
-            "activation_function": Sigmoid(),
-        },
-        {
-            "layers": [4, 4, 4],
-            "activation_function": Sigmoid(),
-        },
-        {
-            "layers": [3, 3, 3, 3],
-            "activation_function": Sigmoid(),
-        },
-        {
-            "layers": [4, 3],
-            "activation_function": TanH(),
-        },
-        {
-            "layers": [4, 4, 4],
-            "activation_function": TanH(),
-        },
-        {
-            "layers": [3, 3, 3, 3],
-            "activation_function": TanH(),
-        },
-        {
-            "layers": [4, 3],
-            "activation_function": ReLU(),
-        },
-        {
-            "layers": [4, 4, 4],
-            "activation_function": ReLU(),
-        },
-        {
-            "layers": [3, 3, 3, 3],
-            "activation_function": ReLU(),
-        },
-    ]
 
     for c in configs:
         with open("train_data.csv", "r") as read_obj:
@@ -161,6 +162,36 @@ def training():
             ).start()
 
 
+def testing():
+    for c in configs:
+        with open("new.csv", "r") as read_obj:
+            csv_reader = reader(read_obj)
+            data = list(
+                map(
+                    lambda x: [list(map(float, x[:-1])), [float(x[-1])]],
+                    list(csv_reader),
+                )
+            )
+            x, y = zip(*data)
+            x = list(x)
+            y = list(y)
+
+            neural_network = NeuralNetwork(
+                layers=[len(x[0])] + c["layers"] + [1],
+                activation_function=c["activation_function"],
+                initializer=FileInitializer(f"{c['layers']}{c['activation_function']}"),
+                optimizer=GradientDescentOptimizer(),
+            )
+            print(f"config: {c['layers']}{c['activation_function']}")
+            correct = 0
+            for i in range(len(x)):
+                res = neural_network.feed_forward(x[i])
+                if y[i][0] == 1.0 and res[0] >= 0.9 or y[i][0] == 0.0 and res[0] < 0.1:
+                    correct += 1
+
+            print(f"accuracy: {correct / len(x)}")
+
+
 def predict(
     x,
     layers: List[int],
@@ -177,4 +208,4 @@ def predict(
 
 
 if __name__ == "__main__":
-    training()
+    testing()
