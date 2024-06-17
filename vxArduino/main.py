@@ -2,7 +2,7 @@ import csv, serial
 import json
 import time
 from time import sleep
-
+from neural_networking import predict, Sigmoid
 arduino = serial.Serial("COM3", 9600)
 
 previous_data = None
@@ -13,6 +13,8 @@ def read_from_arduino():
     line = arduino.readline().decode().strip()
     return json.loads(line)
 
+def send_signal_arduino():
+    arduino.write(b'W') # or sth else
 
 last_watered = int(time.time()) - 304_800
 while True:
@@ -44,3 +46,12 @@ while True:
             writer = csv.writer(file)
             writer.writerow(data_line)
         previous_data = data_line
+
+        # predict function call
+        prediction = predict(
+            x=data_line[:-1],
+            layers=[4,3],
+            activation_function=Sigmoid()
+        )
+        if prediction[0] >= 0.9:
+            send_signal_arduino()
